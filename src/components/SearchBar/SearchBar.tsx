@@ -1,5 +1,4 @@
 import styles from "./SearchBar.module.css";
-
 import { toast } from "react-hot-toast";
 
 interface SearchBarProps {
@@ -8,15 +7,14 @@ interface SearchBarProps {
 
 export default function SearchBar({ onSubmit }: SearchBarProps) {
   const handleSearchAction = (formData: FormData) => {
-    const rawQuery = formData.get("query") as string;
-    const trimmedQuery = rawQuery.trim();
+    const rawQuery = formData.get("query");
 
-    if (trimmedQuery === "") {
+    if (typeof rawQuery !== "string" || rawQuery.trim() === "") {
       toast.error("Please enter your search query.");
       return;
     }
 
-    onSubmit(trimmedQuery);
+    onSubmit(rawQuery.trim());
   };
 
   return (
@@ -40,6 +38,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
             placeholder="Search movies..."
             autoFocus
           />
+
           <button className={styles.button} type="submit">
             Search
           </button>

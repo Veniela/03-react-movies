@@ -9,7 +9,7 @@ import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 
-import { fetchMovies } from "../../services/movieService";
+import fetchMovies from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 
 export default function App() {
@@ -19,22 +19,21 @@ export default function App() {
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
   const handleSearch = async (query: string) => {
+    setMovies([]);
+    setIsError(false);
+    setIsLoading(true);
+
     try {
-      setMovies([]);
-      setIsError(false);
-      setIsLoading(true);
+      const movies = await fetchMovies(query);
 
-      const data = await fetchMovies(query);
-
-      if (data.results.length === 0) {
+      if (movies.length === 0) {
         toast.error("No movies found for your request.");
         return;
       }
 
-      setMovies(data.results);
-    } catch (error) {
+      setMovies(movies);
+    } catch {
       setIsError(true);
-      console.log("Error fetching movies:", error);
     } finally {
       setIsLoading(false);
     }
@@ -46,15 +45,15 @@ export default function App() {
 
       <SearchBar onSubmit={handleSearch} />
 
-      <main className={styles.container}></main>
+      <main className={styles.container}>
+        {isLoading && <Loader />}
 
-      {isLoading && <Loader />}
+        {isError && <ErrorMessage />}
 
-      {isError && <ErrorMessage />}
-
-      {movies.length > 0 && !isLoading && (
-        <MovieGrid movies={movies} onSelect={setSelectedMovie} />
-      )}
+        {movies.length > 0 && !isLoading && (
+          <MovieGrid movies={movies} onSelect={setSelectedMovie} />
+        )}
+      </main>
 
       {selectedMovie && (
         <MovieModal
