@@ -1,6 +1,7 @@
 import styles from "./App.module.css";
 
 import { useState } from "react";
+import axios from "axios";
 import { Toaster, toast } from "react-hot-toast";
 
 import SearchBar from "../SearchBar/SearchBar";
@@ -32,8 +33,15 @@ export default function App() {
       }
 
       setMovies(movies);
-    } catch {
+    } catch (error) {
       setIsError(true);
+
+      if (axios.isAxiosError(error)) {
+        console.error("Status:", error.response?.status);
+        console.error("Response:", error.response?.data);
+      } else {
+        console.error("Error:", error);
+      }
     } finally {
       setIsLoading(false);
     }
